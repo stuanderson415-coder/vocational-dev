@@ -4,15 +4,20 @@
     "title": "Accordion (no JS)",
     "category": "Layout",
     "notes": "Native details/summary, works without scripts.",
-    "html": "<details><summary>Click to expand</summary><p>Hidden content goes here.</p></details>",
-    "updatedAt": 0
+    "html": "<details><summary>Click to expand</summary><p>Hidden content goes here.</p></details>"
   },
   {
     "id": "seed-callout",
     "title": "Info callout",
     "category": "Callout",
     "notes": "Uses Bootstrap alert classes available in Moodle themes.",
-    "html": "<div class=\"alert alert-info\" role=\"alert\"><strong>Tip:</strong> Save your work often.</div>",
-    "updatedAt": 0
+    "html": "<div class=\"alert alert-info\" role=\"alert\"><strong>Tip:</strong> Save your work often.</div>"
+  },
+  {
+    "id": "smvtgtbx5ugv",
+    "title": "EI Drag and Drop Activity",
+    "category": "elearning",
+    "notes": "This is a drag and drop activity for use in moodle for elearning on emotional intelligence.",
+    "html": "\n<div style=\"font-family:Arial,sans-serif;line-height:1.6;color:#243247;max-width:850px;margin:auto;\">\n\n  <div style=\"background:#17324d;color:#ffffff;padding:22px;border-radius:10px;\">\n    <h2 style=\"color:#ffffff;margin:0;\">Emotional Intelligence in Practice</h2>\n    <p style=\"margin-bottom:0;\">Goleman's Four Domains of Emotional Intelligence</p>\n  </div>\n\n  <div style=\"background:#eaf2f8;padding:16px;margin-top:12px;border-radius:8px;\">\n    <h3>Instructions</h3>\n    <p>Read each workplace scenario. Drag the emotional intelligence domain into the matching space.</p>\n    <p>Think about the skill being demonstrated rather than simply the emotion being experienced.</p>\n  </div>\n\n  <div style=\"border:1px solid #b8cee1;padding:16px;margin-top:12px;border-radius:8px;\">\n    <h3>Scenario 1: Receiving feedback</h3>\n    <p>A support worker notices that they become defensive when receiving feedback. They reflect on why this happens and recognise how their feelings influence their behaviour.</p>\n    <p><strong>Domain:</strong> [[1]]</p>\n  </div>\n\n  <div style=\"border:1px solid #b8cee1;padding:16px;margin-top:12px;border-radius:8px;\">\n    <h3>Scenario 2: Managing a difficult interaction</h3>\n    <p>During an aggressive interaction, a worker remains calm, regulates their emotions and follows appropriate de-escalation procedures.</p>\n    <p><strong>Domain:</strong> [[2]]</p>\n  </div>\n\n  <div style=\"border:1px solid #b8cee1;padding:16px;margin-top:12px;border-radius:8px;\">\n    <h3>Scenario 3: Recognising emotional needs</h3>\n    <p>A peer worker notices that a participant has become unusually withdrawn. They consider how the participant might be feeling and respond with sensitivity.</p>\n    <p><strong>Domain:</strong> [[3]]</p>\n  </div>\n\n  <div style=\"border:1px solid #b8cee1;padding:16px;margin-top:12px;border-radius:8px;\">\n    <h3>Scenario 4: Resolving team conflict</h3>\n    <p>Two colleagues disagree about a support plan. A team leader facilitates respectful discussion and helps them reach a shared agreement.</p>\n    <p><strong>Domain:</strong> [[4]]</p>\n  </div>\n\n  <div style=\"background:#f0f5f2;padding:16px;margin-top:12px;border-radius:8px;\">\n    <h3>Reflection</h3>\n    <p>Emotional intelligence is not simply about controlling emotions. It involves recognising emotions, understanding their influence, responding effectively and building healthy relationships.</p>\n  </div>\n\n</div>\n"
   }
 ]
