@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>Moodle-safe HTML</h1>
+<nav><a href="index.html">Library</a><a href="add.html">Add snippet</a><a href="test.html">Test</a><a href="guide.html">Guide</a></nav></header>
+<main>
+<div class="card"><h2>Using snippets in eLearn</h2>
+<ol><li>Find a snippet in the <a href="index.html">Library</a> and click <b>Copy HTML</b>.</li>
+<li>In Moodle's editor, switch to the code view (<code>&lt;/&gt;</code> button).</li>
+<li>Paste, then switch back and check it displays correctly.</li></ol></div>
+<div class="card"><h2>What Moodle usually strips</h2>
+<ul><li><code>&lt;script&gt;</code>, <code>&lt;style&gt;</code>, <code>&lt;link&gt;</code>, <code>&lt;meta&gt;</code></li>
+<li>Inline event handlers such as <code>onclick</code> and <code>javascript:</code> links</li>
+<li>Forms and <code>&lt;object&gt;</code>/<code>&lt;embed&gt;</code></li></ul>
+<h3>Safe approach</h3>
+<ul><li>Use inline <code>style="…"</code> and theme (Bootstrap) classes.</li>
+<li>Use <code>&lt;details&gt;</code> for expandable content instead of JavaScript.</li>
+<li>Always include <code>alt</code> text on images.</li></ul></div>
+<div class="card"><h2>About this site</h2>
+<p>Snippets are saved in this browser (localStorage). Use <b>Export JSON</b> on the Library page to back up or move them to another computer. The preview loads Bootstrap 4 from a CDN to approximate Moodle's look, so your theme may differ; always confirm in eLearn.</p></div>
+</main>
+<script src="app.js"></script></body></html>

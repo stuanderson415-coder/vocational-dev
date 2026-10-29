@@ -1,0 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;700&family=Source+Sans+Pro:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap");
+:root{--light:#faf8f8;--lightgray:#e5e5e5;--gray:#b8b8b8;--darkgray:#4e4e4e;--dark:#2b2b2b;--secondary:#284b63;--tertiary:#84a59d;--highlight:#8f9fa926;--danger:#db4242;
+--headerFont:"Schibsted Grotesk",system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--bodyFont:"Source Sans Pro",system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--codeFont:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+@media(prefers-color-scheme:dark){:root{--light:#161618;--lightgray:#393639;--gray:#646464;--darkgray:#d4d4d4;--dark:#ebebec;--secondary:#7b97aa}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--light);color:var(--darkgray);font-family:var(--bodyFont);font-size:1.05rem;line-height:1.6;display:grid;grid-template:"side main"/300px minmax(0,1fr);min-height:100vh}
+h1,h2,h3{font-family:var(--headerFont);color:var(--dark);line-height:1.2}
+h2{font-size:1.75rem;margin:0 0 1rem}
+a{color:var(--secondary);font-weight:600;text-decoration:none;transition:color .2s}
+a:hover{color:var(--tertiary)}
+header{grid-area:side;padding:2rem 1.5rem;border-right:1px solid var(--lightgray);position:sticky;top:0;height:100vh}
+header h1{font-size:2rem;margin:0 0 1.5rem}
+nav{display:flex;flex-direction:column;gap:.2rem}
+nav a{color:var(--darkgray);padding:.35rem .7rem;border-radius:5px;font-weight:400}
+nav a:hover{background:var(--lightgray);color:var(--dark)}
+nav a.active{background:var(--highlight);color:var(--secondary);font-weight:600}
+main{grid-area:main;max-width:900px;width:100%;margin:0 auto;padding:2.5rem 1.5rem}
+.card{background:var(--light);border:1px solid var(--lightgray);border-radius:5px;padding:1.1rem 1.25rem;margin-bottom:1rem}
+.card h3{margin:.4rem 0}
+.card p{margin:.3rem 0 .6rem}
+.tag{display:inline-block;background:var(--highlight);color:var(--secondary);border-radius:5px;padding:0 .5rem;font-size:.85rem;font-weight:600}
+.tag:before{content:"#"}
+label{display:block;font-weight:600;margin:.9rem 0 .25rem;color:var(--dark)}
+input,textarea,select{width:100%;padding:.5rem .7rem;border:1px solid var(--lightgray);border-radius:5px;background:var(--light);color:var(--darkgray);font:inherit}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--tertiary);border-color:var(--secondary)}
+textarea{font-family:var(--codeFont);font-size:.88rem;min-height:280px}
+button,.btn{background:var(--secondary);color:var(--light);border:0;border-radius:5px;padding:.4rem .9rem;cursor:pointer;font:inherit;font-weight:600;display:inline-block;margin:.3rem .3rem .3rem 0;transition:background .2s}
+button:hover,.btn:hover{background:var(--tertiary);color:var(--light)}
+button.secondary,.btn.secondary{background:var(--highlight);color:var(--secondary)}
+button.secondary:hover,.btn.secondary:hover{background:var(--lightgray)}
+button.danger{background:transparent;color:var(--danger)}
+button.danger:hover{background:#db424222}
+iframe{width:100%;min-height:360px;border:1px solid var(--lightgray);background:#fff;border-radius:5px;resize:vertical}
+.msg{padding:.4rem .75rem;border-radius:5px;margin:.3rem 0;border-left:4px solid;font-size:.95rem}
+.ok{background:#09ad7110;border-color:#09ad71}
+.warn{background:#db894210;border-color:#db8942}
+.bad{background:#db424210;border-color:#db4242}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+pre{background:var(--lightgray);padding:.8rem;border-radius:5px;overflow:auto}
+code{font-family:var(--codeFont);font-size:.88em;background:var(--lightgray);padding:.1rem .3rem;border-radius:5px}
+@media(max-width:800px){
+body{grid-template:"side" auto "main" auto/minmax(0,1fr)}
+header{position:static;height:auto;border-right:0;border-bottom:1px solid var(--lightgray);padding:1rem}
+header h1{margin-bottom:.6rem}
+nav{flex-direction:row;flex-wrap:wrap}
+.row{grid-template-columns:1fr}}
+#rain{position:fixed;inset:0;width:100%;height:100%;z-index:-1;opacity:.4;pointer-events:none}
+header{background:color-mix(in srgb,var(--light) 80%,transparent)}

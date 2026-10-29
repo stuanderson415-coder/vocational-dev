@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moodle-safe HTML Library</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>Moodle-safe HTML</h1>
+<nav><a href="index.html">Library</a><a href="add.html">Add snippet</a><a href="test.html">Test</a><a href="guide.html">Guide</a></nav></header>
+<main>
+<div class="card">
+  <input id="q" placeholder="Search snippets…" aria-label="Search">
+  <button id="export" class="secondary">Export JSON</button>
+  <label class="btn secondary" style="font-weight:normal">Import JSON<input id="import" type="file" accept=".json" hidden></label>
+</div>
+<div id="list"></div>
+</main>
+<script src="app.js"></script>
+<script>
+const list = document.getElementById('list'), q = document.getElementById('q');
+function render() {
+  const t = q.value.toLowerCase();
+  const items = store.all().filter(s => (s.title + s.category + s.notes + s.html).toLowerCase().includes(t));
+  list.innerHTML = items.map(s => `<div class="card">
+    <span class="tag">${esc(s.category || 'Uncategorised')}</span><h3>${esc(s.title)}</h3>
+    <p>${esc(s.notes)}</p>
+    <button data-copy="${esc(s.id)}">Copy HTML</button>
+    <a class="btn secondary" href="test.html?id=${encodeURIComponent(s.id)}">Test</a>
+    <a class="btn secondary" href="add.html?id=${encodeURIComponent(s.id)}">Edit</a>
+    <button class="danger" data-del="${esc(s.id)}">Delete</button></div>`).join('') || '<p>No snippets yet. <a href="add.html">Add one</a>.</p>';
+}
+list.addEventListener('click', e => {
+  const c = e.target.dataset.copy, d = e.target.dataset.del;
+  if (c) copyText(store.get(c).html, e.target);
+  if (d && confirm('Delete this snippet?')) { store.remove(d); render(); }
+});
+q.addEventListener('input', render);
+document.getElementById('export').onclick = () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(store.all(), null, 2)], { type: 'application/json' }));
+  a.download = 'moodle-snippets.json'; a.click();
+};
+document.getElementById('import').onchange = async e => {
+  try {
+    const data = JSON.parse(await e.target.files[0].text());
+    if (!Array.isArray(data)) throw 0;
+    data.filter(s => s && s.title && s.html).forEach(s => store.upsert({ ...s, id: s.id || newId() }));
+    render();
+  } catch { alert('Invalid snippet file.'); }
+};
+render();
+</script></body></html>

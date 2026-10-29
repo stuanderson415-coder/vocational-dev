@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Add snippet</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>Moodle-safe HTML</h1>
+<nav><a href="index.html">Library</a><a href="add.html">Add snippet</a><a href="test.html">Test</a><a href="guide.html">Guide</a></nav></header>
+<main>
+<h2 id="h">Add snippet</h2>
+<div class="row">
+  <form id="f" class="card">
+    <label for="title">Title</label><input id="title" required>
+    <label for="category">Category</label><input id="category" list="cats" placeholder="e.g. Callout, Layout, Table">
+    <datalist id="cats"></datalist>
+    <label for="notes">Notes</label><input id="notes">
+    <label for="html">HTML</label><textarea id="html" required></textarea>
+    <button>Save snippet</button><a class="btn secondary" href="index.html">Cancel</a>
+  </form>
+  <div class="card"><h3>Live preview</h3><div id="checks"></div><iframe id="p" title="Preview"></iframe></div>
+</div>
+</main>
+<script src="app.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const editing = param('id') ? store.get(param('id')) : null;
+$('cats').innerHTML = [...new Set(store.all().map(s => s.category).filter(Boolean))].map(c => `<option value="${esc(c)}">`).join('');
+if (editing) { $('h').textContent = 'Edit snippet'; ['title', 'category', 'notes', 'html'].forEach(k => $(k).value = editing[k] || ''); }
+function update() { $('checks').innerHTML = renderChecks(checkHtml($('html').value)); preview($('p'), $('html').value); }
+$('html').addEventListener('input', update); update();
+$('f').onsubmit = e => {
+  e.preventDefault();
+  store.upsert({ id: editing ? editing.id : newId(), title: $('title').value.trim(), category: $('category').value.trim(), notes: $('notes').value.trim(), html: $('html').value });
+  location.href = 'index.html';
+};
+</script></body></html>

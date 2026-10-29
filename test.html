@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Test HTML</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>Moodle-safe HTML</h1>
+<nav><a href="index.html">Library</a><a href="add.html">Add snippet</a><a href="test.html">Test</a><a href="guide.html">Guide</a></nav></header>
+<main>
+<h2>Test HTML</h2>
+<p>Paste any HTML or load a saved snippet. The preview runs with scripts disabled, like Moodle.</p>
+<div class="card">
+  <label for="sel">Load saved snippet</label><select id="sel"><option value="">—</option></select>
+</div>
+<div class="row">
+  <div class="card"><label for="html">HTML</label><textarea id="html"></textarea>
+    <button id="copy">Copy HTML</button><button id="save" class="secondary">Save to library…</button></div>
+  <div class="card"><h3>Safety check</h3><div id="checks"></div><h3>Preview</h3><iframe id="p" title="Preview"></iframe></div>
+</div>
+</main>
+<script src="app.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const all = store.all();
+all.forEach(s => $('sel').insertAdjacentHTML('beforeend', `<option value="${esc(s.id)}">${esc(s.title)}</option>`));
+function update() { $('checks').innerHTML = renderChecks(checkHtml($('html').value)); preview($('p'), $('html').value); }
+$('sel').onchange = () => { const s = store.get($('sel').value); if (s) { $('html').value = s.html; update(); } };
+$('html').addEventListener('input', update);
+$('copy').onclick = e => copyText($('html').value, e.target);
+$('save').onclick = () => {
+  const title = prompt('Snippet title?'); if (!title) return;
+  store.upsert({ id: newId(), title, category: '', notes: '', html: $('html').value });
+  location.href = 'index.html';
+};
+const pre = param('id') ? store.get(param('id')) : null;
+if (pre) { $('html').value = pre.html; $('sel').value = pre.id; }
+update();
+</script></body></html>
