@@ -1,0 +1,18 @@
+[
+  {
+    "id": "seed-accordion",
+    "title": "Accordion (no JS)",
+    "category": "Layout",
+    "notes": "Native details/summary, works without scripts.",
+    "html": "<details><summary>Click to expand</summary><p>Hidden content goes here.</p></details>",
+    "updatedAt": 0
+  },
+  {
+    "id": "seed-callout",
+    "title": "Info callout",
+    "category": "Callout",
+    "notes": "Uses Bootstrap alert classes available in Moodle themes.",
+    "html": "<div class=\"alert alert-info\" role=\"alert\"><strong>Tip:</strong> Save your work often.</div>",
+    "updatedAt": 0
+  }
+]

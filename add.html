@@ -3,7 +3,7 @@
 <title>Add snippet | elearning.fastigiatalab.com</title><link rel="stylesheet" href="style.css"></head>
 <body>
 <header><h1>elearning.fastigiatalab.com</h1>
-<nav><a href="index.html">Library</a><a href="add.html">Add snippet</a><a href="test.html">Test</a><a href="embed.html">Embed</a><a href="projects.html">Projects</a><a href="guide.html">Guide</a><a href="https://fastigiatalab.com">Lab</a></nav></header>
+<nav><a href="index.html">Library</a><a href="add.html">Add snippet</a><a href="test.html">Test</a><a href="embed.html">Embed</a><a href="projects.html">Projects</a><a href="sync.html">Sync</a><a href="guide.html">Guide</a><a href="https://fastigiatalab.com">Lab</a></nav></header>
 <main>
 <h2 id="h">Add snippet</h2>
 <div class="row">
@@ -11,6 +11,8 @@
     <label for="title">Title</label><input id="title" required>
     <label for="category">Category</label><input id="category" list="cats" placeholder="e.g. Callout, Layout, Table">
     <datalist id="cats"></datalist>
+    <label for="tags">Tags</label><input id="tags" list="taglist" placeholder="#tafe #assessment #callout" autocomplete="off">
+    <datalist id="taglist"></datalist>
     <label for="notes">Notes</label><input id="notes">
     <label for="html">HTML</label><textarea id="html" required></textarea>
     <button>Save snippet</button><a class="btn secondary" href="index.html">Cancel</a>
@@ -23,12 +25,13 @@
 const $ = id => document.getElementById(id);
 const editing = param('id') ? store.get(param('id')) : null;
 $('cats').innerHTML = [...new Set(store.all().map(s => s.category).filter(Boolean))].map(c => `<option value="${esc(c)}">`).join('');
-if (editing) { $('h').textContent = 'Edit snippet'; ['title', 'category', 'notes', 'html'].forEach(k => $(k).value = editing[k] || ''); }
+$('taglist').innerHTML = [...new Set(store.all().flatMap(s => s.tags || []))].map(t => `<option value="#${esc(t)}">`).join('');
+if (editing) { $('h').textContent = 'Edit snippet'; ['title', 'category', 'notes', 'html'].forEach(k => $(k).value = editing[k] || ''); $('tags').value = (editing.tags || []).map(t => '#' + t).join(' '); }
 function update() { $('checks').innerHTML = renderChecks(checkHtml($('html').value)); preview($('p'), $('html').value); }
 $('html').addEventListener('input', update); update();
 $('f').onsubmit = e => {
   e.preventDefault();
-  store.upsert({ id: editing ? editing.id : newId(), title: $('title').value.trim(), category: $('category').value.trim(), notes: $('notes').value.trim(), html: $('html').value });
+  store.upsert({ id: editing ? editing.id : newId(), title: $('title').value.trim(), category: $('category').value.trim(), tags: parseTags($('tags').value), notes: $('notes').value.trim(), html: $('html').value });
   location.href = 'index.html';
 };
 </script></body></html>

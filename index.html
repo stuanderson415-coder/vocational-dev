@@ -3,35 +3,56 @@
 <title>elearning.fastigiatalab.com</title><link rel="stylesheet" href="style.css"></head>
 <body>
 <header><h1>elearning.fastigiatalab.com</h1>
-<nav><a href="index.html">Library</a><a href="add.html">Add snippet</a><a href="test.html">Test</a><a href="embed.html">Embed</a><a href="projects.html">Projects</a><a href="guide.html">Guide</a><a href="https://fastigiatalab.com">Lab</a></nav></header>
+<nav><a href="index.html">Library</a><a href="add.html">Add snippet</a><a href="test.html">Test</a><a href="embed.html">Embed</a><a href="projects.html">Projects</a><a href="sync.html">Sync</a><a href="guide.html">Guide</a><a href="https://fastigiatalab.com">Lab</a></nav></header>
 <main>
 <div class="card">
-  <input id="q" placeholder="Search snippets…" aria-label="Search">
+  <div class="row">
+    <input id="q" placeholder="Search snippets…" aria-label="Search">
+    <select id="tagsel" aria-label="Filter by tag"></select>
+  </div>
   <button id="export" class="secondary">Export JSON</button>
   <label class="btn secondary" style="font-weight:normal">Import JSON<input id="import" type="file" accept=".json" hidden></label>
 </div>
+<p id="syncstat" class="intro" style="font-size:.8rem"></p>
 <div id="list"></div>
 </main>
 <script src="app.js"></script>
 <script>
-const list = document.getElementById('list'), q = document.getElementById('q');
+const list = document.getElementById('list'), q = document.getElementById('q'), tagsel = document.getElementById('tagsel');
+function fillTags() {
+  const all = store.all(), cur = tagsel.value;
+  const counts = {};
+  all.forEach(s => (s.tags || []).forEach(t => counts[t] = (counts[t] || 0) + 1));
+  tagsel.innerHTML = '<option value="">All tags</option>' + Object.keys(counts).sort()
+    .map(t => `<option value="${esc(t)}">#${esc(t)} (${counts[t]})</option>`).join('');
+  tagsel.value = counts[cur] ? cur : '';
+}
 function render() {
+  fillTags();
   const t = q.value.toLowerCase();
-  const items = store.all().filter(s => (s.title + s.category + s.notes + s.html).toLowerCase().includes(t));
+  const items = store.all().filter(s => (!tagsel.value || (s.tags || []).includes(tagsel.value)) && (s.title + s.category + s.notes + s.html + (s.tags || []).map(t => ' #' + t).join('')).toLowerCase().includes(t));
   list.innerHTML = items.map(s => `<div class="card">
-    <span class="tag">${esc(s.category || 'Uncategorised')}</span><h3>${esc(s.title)}</h3>
+    <span class="tag">${esc(s.category || 'Uncategorised')}</span>
+    ${(s.tags || []).map(t => `<button class="tag utag" data-tag="${esc(t)}" title="Filter by #${esc(t)}">${esc(t)}</button>`).join('')}<h3>${esc(s.title)}</h3>
     <p>${esc(s.notes)}</p>
     <button data-copy="${esc(s.id)}">Copy HTML</button>
     <a class="btn secondary" href="test.html?id=${encodeURIComponent(s.id)}">Test</a>
     <a class="btn secondary" href="add.html?id=${encodeURIComponent(s.id)}">Edit</a>
+    <button class="secondary" data-share="${esc(s.id)}">Share</button>
     <button class="danger" data-del="${esc(s.id)}">Delete</button></div>`).join('') || '<p>No snippets yet. <a href="add.html">Add one</a>.</p>';
 }
 list.addEventListener('click', e => {
-  const c = e.target.dataset.copy, d = e.target.dataset.del;
+  const c = e.target.dataset.copy, d = e.target.dataset.del, tg = e.target.dataset.tag, sh = e.target.dataset.share;
+  if (sh) shareLink(store.get(sh)).then(url => {
+    copyText(url, e.target);
+    if (url.length > 8000) alert('This link is very long and may not work in some apps. Consider sharing the HTML directly.');
+  });
+  if (tg) { tagsel.value = tg; render(); }
   if (c) copyText(store.get(c).html, e.target);
   if (d && confirm('Delete this snippet?')) { store.remove(d); render(); }
 });
 q.addEventListener('input', render);
+tagsel.addEventListener('change', render);
 document.getElementById('export').onclick = () => {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify(store.all(), null, 2)], { type: 'application/json' }));
@@ -45,5 +66,11 @@ document.getElementById('import').onchange = async e => {
     render();
   } catch { alert('Invalid snippet file.'); }
 };
+document.addEventListener('snippets-synced', render);
+function showStatus() {
+  const s = JSON.parse(localStorage.getItem('moodleSafeSyncStatus') || 'null');
+  document.getElementById('syncstat').textContent = s ? (s.ok ? '' : '⚠ ') + 'Sync: ' + s.msg : '';
+}
+document.addEventListener('sync-status', showStatus); showStatus();
 render();
 </script></body></html>

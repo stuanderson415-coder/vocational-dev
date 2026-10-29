@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sync | elearning.fastigiatalab.com</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>elearning.fastigiatalab.com</h1>
+<nav><a href="index.html">Library</a><a href="add.html">Add snippet</a><a href="test.html">Test</a><a href="embed.html">Embed</a><a href="projects.html">Projects</a><a href="sync.html">Sync</a><a href="guide.html">Guide</a><a href="https://fastigiatalab.com">Lab</a></nav></header>
+<main>
+<h2>Sync</h2>
+<p class="intro">Your library is saved in <code>snippets.json</code> in your GitHub repo, so it is permanent and shared across machines. Changes are committed automatically when a token is set on this browser.</p>
+<div class="row">
+  <form id="f" class="card">
+    <div class="row">
+      <div><label for="owner">Owner</label><input id="owner"></div>
+      <div><label for="repo">Repository</label><input id="repo"></div>
+    </div>
+    <div class="row">
+      <div><label for="branch">Branch</label><input id="branch"></div>
+      <div><label for="path">File path</label><input id="path"></div>
+    </div>
+    <label for="token">GitHub token</label>
+    <input id="token" type="password" autocomplete="off" placeholder="github_pat_…">
+    <button>Save and sync now</button><button type="button" id="clear" class="danger">Remove token</button>
+    <div id="status"></div>
+  </form>
+  <div class="card"><h3>Set up a token (once per browser)</h3>
+    <ol>
+      <li>GitHub → Settings → Developer settings → <b>Fine-grained tokens</b> → Generate new token.</li>
+      <li>Repository access: <b>Only select repositories</b> → this repo.</li>
+      <li>Permissions → Repository → <b>Contents: Read and write</b>.</li>
+      <li>Paste the token here and save.</li>
+    </ol>
+    <p>The token stays in this browser only. Anyone using this browser can edit your repo, so don't save it on shared computers.</p>
+    <p>Without a token the site only reads the published <code>snippets.json</code> (read-only). Each commit triggers a Cloudflare Pages rebuild, so the published copy lags by about a minute.</p>
+  </div>
+</div>
+</main>
+<script src="app.js"></script>
+<script>
+const $ = id => document.getElementById(id), F = ['owner', 'repo', 'branch', 'path', 'token'];
+const c = syncCfg(); F.forEach(k => $(k).value = c[k]);
+function show() {
+  const s = JSON.parse(localStorage.getItem('moodleSafeSyncStatus') || 'null');
+  $('status').innerHTML = s ? `<div class="msg ${s.ok ? 'ok' : 'bad'}">${esc(s.msg)}</div>` : '';
+}
+document.addEventListener('sync-status', show); show();
+$('f').onsubmit = async e => {
+  e.preventDefault();
+  localStorage.setItem(SYNC_KEY, JSON.stringify(Object.fromEntries(F.map(k => [k, $(k).value.trim()]))));
+  while (syncing) await new Promise(r => setTimeout(r, 100));
+  try { await syncNow(); } catch {}
+};
+$('clear').onclick = () => { $('token').value = ''; localStorage.setItem(SYNC_KEY, JSON.stringify({ ...syncCfg(), token: '' })); setStatus('Token removed'); };
+</script></body></html>

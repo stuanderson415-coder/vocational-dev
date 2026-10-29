@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shared snippet | elearning.fastigiatalab.com</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>elearning.fastigiatalab.com</h1>
+<nav><a href="index.html">Library</a><a href="add.html">Add snippet</a><a href="test.html">Test</a><a href="embed.html">Embed</a><a href="projects.html">Projects</a><a href="sync.html">Sync</a><a href="guide.html">Guide</a><a href="https://fastigiatalab.com">Lab</a></nav></header>
+<main>
+<h2>Shared snippet</h2>
+<div id="err" class="card" hidden>This share link is invalid or incomplete. Ask the sender for a new one.</div>
+<div id="view" hidden>
+  <div class="card"><span class="tag" id="cat"></span><span id="tags"></span><h3 id="ttl"></h3><p id="notes"></p>
+    <button id="copy">Copy HTML</button><button id="save" class="secondary">Save to my library</button></div>
+  <div class="row">
+    <div class="card"><label for="code" style="margin-top:0">HTML</label><textarea id="code" readonly></textarea></div>
+    <div class="card"><h3>Safety check</h3><div id="checks"></div><h3>Preview</h3><iframe id="p" title="Preview"></iframe></div>
+  </div>
+</div>
+</main>
+<script src="app.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+(async () => {
+  try {
+    const s = await unpackSnippet(location.hash.slice(1));
+    $('cat').textContent = s.category || 'Uncategorised';
+    $('tags').innerHTML = s.tags.map(t => `<span class="tag utag" style="cursor:default;margin-left:6px">${esc(t)}</span>`).join('');
+    $('ttl').textContent = s.title; $('notes').textContent = s.notes;
+    $('code').value = s.html;
+    $('checks').innerHTML = renderChecks(checkHtml(s.html));
+    preview($('p'), s.html);
+    $('copy').onclick = e => copyText(s.html, e.target);
+    $('save').onclick = () => { store.upsert({ ...s, id: newId() }); location.href = 'index.html'; };
+    $('view').hidden = false;
+  } catch { $('err').hidden = false; }
+})();
+</script></body></html>

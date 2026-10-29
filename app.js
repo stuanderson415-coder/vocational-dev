@@ -10,23 +10,84 @@ const SEED = [{
   html: '<details><summary>Click to expand</summary><p>Hidden content goes here.</p></details>'
 }];
 
+const SYNC_KEY = 'moodleSafeSync';
+const syncCfg = () => ({ owner: 'stuanderson415-coder', repo: 'vocational-dev', branch: 'main', path: 'snippets.json', token: '', ...JSON.parse(localStorage.getItem(SYNC_KEY) || '{}') });
+
+// Records carry updatedAt; deletes are kept as {id, deleted:true} tombstones so they sync.
 const store = {
-  all() {
+  raw() {
     const raw = localStorage.getItem(KEY);
-    if (raw === null) { this.save(SEED); return SEED.slice(); }
+    if (raw === null) { this.setRaw(SEED.map(s => ({ ...s, updatedAt: 0 }))); return this.raw(); }
     try { return JSON.parse(raw); } catch { return []; }
   },
-  save(list) { localStorage.setItem(KEY, JSON.stringify(list)); },
+  setRaw(list) { localStorage.setItem(KEY, JSON.stringify(list)); },
+  all() { return this.raw().filter(s => !s.deleted); },
+  save(list) { this.setRaw(list); scheduleSync(); },
   get(id) { return this.all().find(s => s.id === id); },
   upsert(s) {
-    const list = this.all(), i = list.findIndex(x => x.id === s.id);
-    if (i >= 0) list[i] = s; else list.push(s);
+    const list = this.raw(), rec = { ...s, updatedAt: Date.now() }, i = list.findIndex(x => x.id === s.id);
+    if (i >= 0) list[i] = rec; else list.push(rec);
     this.save(list);
   },
-  remove(id) { this.save(this.all().filter(s => s.id !== id)); }
+  remove(id) {
+    this.save(this.raw().map(s => s.id === id ? { id, deleted: true, updatedAt: Date.now() } : s));
+  }
 };
 
+function mergeSnippets(a, b) {
+  const map = new Map();
+  [...a, ...b].forEach(s => {
+    if (!s || !s.id) return;
+    const cur = map.get(s.id);
+    if (!cur || (s.updatedAt || 0) > (cur.updatedAt || 0)) map.set(s.id, s);
+  });
+  return [...map.values()].sort((x, y) => x.id < y.id ? -1 : 1);
+}
+const canon = list => JSON.stringify(mergeSnippets(list, []));
+const toB64 = str => { let bin = ''; new TextEncoder().encode(str).forEach(b => bin += String.fromCharCode(b)); return btoa(bin); };
+const fromB64 = b64s => new TextDecoder().decode(Uint8Array.from(atob(b64s.replace(/\s/g, '')), c => c.charCodeAt(0)));
+
+let syncTimer, syncing = false;
+function setStatus(msg, ok = true) { localStorage.setItem('moodleSafeSyncStatus', JSON.stringify({ msg, ok, at: Date.now() })); document.dispatchEvent(new CustomEvent('sync-status')); }
+function scheduleSync() { clearTimeout(syncTimer); syncTimer = setTimeout(() => syncNow().catch(() => {}), 1500); }
+
+// Merges local with the GitHub file, then commits if anything changed. Without a token it only reads the published snippets.json.
+async function syncNow(retry = true) {
+  if (syncing) return;
+  syncing = true;
+  try {
+    const c = syncCfg(), before = canon(store.raw());
+    if (!c.token) {
+      const r = await fetch(new URL(c.path, location.href), { cache: 'no-store' });
+      if (r.ok) store.setRaw(mergeSnippets(store.raw(), await r.json()));
+      setStatus('Read-only (no token set)');
+    } else {
+      const base = `https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.path.split('/').map(encodeURIComponent).join('/')}`;
+      const headers = { Authorization: 'Bearer ' + c.token, Accept: 'application/vnd.github+json' };
+      const g = await fetch(`${base}?ref=${encodeURIComponent(c.branch)}`, { headers, cache: 'no-store' });
+      let remote = [], sha;
+      if (g.ok) { const j = await g.json(); sha = j.sha; remote = JSON.parse(fromB64(j.content) || '[]'); }
+      else if (g.status !== 404) throw new Error(`GitHub read failed (${g.status}). Check token, repo and branch.`);
+      const merged = mergeSnippets(store.raw(), remote);
+      store.setRaw(merged);
+      if (canon(remote) !== canon(merged)) {
+        const p = await fetch(base, { method: 'PUT', headers, body: JSON.stringify({
+          message: 'Update snippets', content: toB64(JSON.stringify(merged, null, 2) + '\n'), branch: c.branch, ...(sha ? { sha } : {}) }) });
+        if (!p.ok) {
+          if ((p.status === 409 || p.status === 422) && retry) { syncing = false; return syncNow(false); }
+          throw new Error(`GitHub write failed (${p.status}). The token needs Contents: read and write.`);
+        }
+        setStatus('Saved to GitHub');
+      } else setStatus('Up to date');
+    }
+    if (canon(store.raw()) !== before) document.dispatchEvent(new CustomEvent('snippets-synced'));
+  } catch (e) { setStatus(e.message || 'Sync failed', false); throw e; }
+  finally { syncing = false; }
+}
+document.addEventListener('DOMContentLoaded', () => { syncNow().catch(() => {}); });
+
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const parseTags = str => [...new Set(String(str || '').split(/[\s,]+/).map(t => t.replace(/^#+/, '').toLowerCase().replace(/[^\w-]/g, '')).filter(Boolean))];
 const newId = () => 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 const param = n => new URLSearchParams(location.search).get(n);
 
@@ -150,3 +211,25 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(tick);
   })();
 });
+
+// Share links: snippet is packed into the URL hash (no server), so anyone with the link can open it.
+const b64 = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64 = str => Uint8Array.from(atob(str.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+async function packSnippet(s) {
+  const raw = new TextEncoder().encode(JSON.stringify({ title: s.title, category: s.category, tags: s.tags, notes: s.notes, html: s.html }));
+  if (typeof CompressionStream === 'undefined') return 'u.' + b64(raw);
+  const buf = await new Response(new Blob([raw]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer();
+  return 'z.' + b64(new Uint8Array(buf));
+}
+async function unpackSnippet(token) {
+  const bytes = unb64(token.slice(2));
+  const raw = token[0] === 'z'
+    ? new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer())
+    : bytes;
+  const o = JSON.parse(new TextDecoder().decode(raw));
+  if (!o || typeof o.html !== 'string') throw new Error('bad snippet');
+  return { title: String(o.title || 'Shared snippet'), category: String(o.category || ''), tags: parseTags((o.tags || []).join(' ')), notes: String(o.notes || ''), html: o.html };
+}
+async function shareLink(s) {
+  return new URL('share.html', location.href).href + '#' + await packSnippet(s);
+}

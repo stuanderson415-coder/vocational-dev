@@ -3,7 +3,7 @@
 <title>Embed | elearning.fastigiatalab.com</title><link rel="stylesheet" href="style.css"></head>
 <body>
 <header><h1>elearning.fastigiatalab.com</h1>
-<nav><a href="index.html">Library</a><a href="add.html">Add snippet</a><a href="test.html">Test</a><a href="embed.html">Embed</a><a href="embed.html">Embed</a><a href="projects.html">Projects</a><a href="guide.html">Guide</a><a href="https://fastigiatalab.com">Lab</a></nav></header>
+<nav><a href="index.html">Library</a><a href="add.html">Add snippet</a><a href="test.html">Test</a><a href="embed.html">Embed</a><a href="embed.html">Embed</a><a href="projects.html">Projects</a><a href="sync.html">Sync</a><a href="guide.html">Guide</a><a href="https://fastigiatalab.com">Lab</a></nav></header>
 <main>
 <h2>Embed</h2>
 <p class="intro">Build, test and display embedded objects. Iframes only survive in Moodle if your site allows them (trusted text / the editor's iframe support), so always confirm in eLearn. Video, audio and links are the safest options.</p>
@@ -72,7 +72,7 @@ $('code').addEventListener('input', refresh);
 $('copy').onclick = e => copyText($('code').value, e.target);
 $('save').onclick = () => {
   const title = prompt('Snippet title?'); if (!title) return;
-  store.upsert({ id: newId(), title, category: 'Embed', notes: TYPES[$('type').value].label, html: $('code').value });
+  store.upsert({ id: newId(), title, category: 'Embed', tags: ['embed'], notes: TYPES[$('type').value].label, html: $('code').value });
   location.href = 'index.html';
 };
 
