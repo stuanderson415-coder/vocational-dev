@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Embed | elearning.fastigiatalab.com</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>elearning.fastigiatalab.com</h1>
+<nav><a href="index.html">Library</a><a href="add.html">Add snippet</a><a href="test.html">Test</a><a href="embed.html">Embed</a><a href="embed.html">Embed</a><a href="projects.html">Projects</a><a href="guide.html">Guide</a><a href="https://fastigiatalab.com">Lab</a></nav></header>
+<main>
+<h2>Embed</h2>
+<p class="intro">Build, test and display embedded objects. Iframes only survive in Moodle if your site allows them (trusted text / the editor's iframe support), so always confirm in eLearn. Video, audio and links are the safest options.</p>
+
+<div class="card">
+  <div class="row">
+    <div><label for="type">Embed type</label><select id="type"></select></div>
+    <div><label for="url">URL</label><input id="url" type="url" placeholder="https://…"></div>
+  </div>
+  <div class="row">
+    <div><label for="ttl">Title (accessibility)</label><input id="ttl" value="Embedded content"></div>
+    <div><label for="h">Height in px (fixed types)</label><input id="h" type="number" value="450" min="100"></div>
+  </div>
+  <p id="hint" style="margin-bottom:0"></p>
+</div>
+
+<div class="row">
+  <div class="card"><label for="code" style="margin-top:0">Generated HTML (editable)</label><textarea id="code"></textarea>
+    <button id="copy">Copy HTML</button><button id="save" class="secondary">Save to library…</button></div>
+  <div class="card"><h3>Safety check</h3><div id="checks"></div><h3>Preview</h3><iframe id="p" title="Preview"></iframe></div>
+</div>
+
+<h2 style="margin-top:1.5rem">Moodle-safe variations</h2>
+<div id="gallery" class="projects"></div>
+</main>
+<script src="app.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const wrap = inner => `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:100%;">${inner}</div>`;
+const FRAME_ABS = 'style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"';
+
+// Each type: label, hint, example URL, build(url, title, height)
+const TYPES = {
+  responsive: { label: 'Iframe: responsive 16:9', hint: 'Best for YouTube, Vimeo, H5P and slides. Needs iframe support enabled.', ex: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
+    build: (u, t) => wrap(`<iframe src="${u}" title="${t}" ${FRAME_ABS} allowfullscreen loading="lazy"></iframe>`) },
+  fixed: { label: 'Iframe: fixed height', hint: 'For documents, PDFs, forms and tools that need a set height.', ex: 'https://example.com',
+    build: (u, t, h) => `<iframe src="${u}" title="${t}" style="width:100%;height:${h}px;border:0;" loading="lazy"></iframe>` },
+  video: { label: 'HTML5 video (no iframe)', hint: 'Native tag, works without iframe permissions. Use a direct .mp4 or .webm link.', ex: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    build: (u, t) => `<video controls preload="metadata" style="width:100%;max-width:720px;" title="${t}"><source src="${u}" type="video/mp4">Your browser does not support video. <a href="${u}">Download the video</a>.</video>` },
+  audio: { label: 'HTML5 audio (no iframe)', hint: 'Native audio player. Use a direct .mp3 link.', ex: 'https://www.w3schools.com/html/horse.mp3',
+    build: (u, t) => `<audio controls preload="metadata" style="width:100%;max-width:480px;" title="${t}"><source src="${u}" type="audio/mpeg">Your browser does not support audio. <a href="${u}">Download the audio</a>.</audio>` },
+  image: { label: 'Image with caption', hint: 'Always safe. Describe the image in the title field (becomes alt text).', ex: 'https://placehold.co/600x300',
+    build: (u, t) => `<figure style="margin:0;max-width:600px;"><img src="${u}" alt="${t}" style="max-width:100%;height:auto;"><figcaption>${t}</figcaption></figure>` },
+  link: { label: 'Link card (safest fallback)', hint: 'Plain link styled as a button; opens in a new tab. Use when iframes are blocked.', ex: 'https://example.com',
+    build: (u, t) => `<p><a class="btn btn-primary" href="${u}" target="_blank" rel="noopener">${t}</a></p>` }
+};
+
+$('type').innerHTML = Object.entries(TYPES).map(([k, v]) => `<option value="${k}">${esc(v.label)}</option>`).join('');
+
+function esc2(s) { return esc(s); }
+function generate() {
+  const t = TYPES[$('type').value];
+  $('hint').textContent = t.hint;
+  if (!$('url').value) $('url').placeholder = t.ex;
+  const u = $('url').value.trim() || t.ex;
+  if (!/^(https?:)?\/\//i.test(u)) { $('code').value = '<!-- Enter a valid http(s) URL -->'; return refresh(); }
+  $('code').value = t.build(esc2(u), esc2($('ttl').value), Math.max(100, +$('h').value || 450));
+  refresh();
+}
+function refresh() {
+  $('checks').innerHTML = renderChecks(checkHtml($('code').value));
+  preview($('p'), $('code').value, true);
+}
+['type', 'url', 'ttl', 'h'].forEach(id => $(id).addEventListener('input', generate));
+$('code').addEventListener('input', refresh);
+$('copy').onclick = e => copyText($('code').value, e.target);
+$('save').onclick = () => {
+  const title = prompt('Snippet title?'); if (!title) return;
+  store.upsert({ id: newId(), title, category: 'Embed', notes: TYPES[$('type').value].label, html: $('code').value });
+  location.href = 'index.html';
+};
+
+// Gallery of ready-made variations, each loadable into the tester
+$('gallery').innerHTML = Object.entries(TYPES).map(([k, v]) => `<div class="card">
+  <span class="tag">${esc(k)}</span><h3>${esc(v.label)}</h3><p>${esc(v.hint)}</p>
+  <button data-k="${k}">Load into tester</button></div>`).join('');
+$('gallery').addEventListener('click', e => {
+  const k = e.target.dataset.k; if (!k) return;
+  $('type').value = k; $('url').value = TYPES[k].ex; generate(); scrollTo({ top: 0, behavior: 'smooth' });
+});
+generate();
+</script></body></html>
