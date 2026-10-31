@@ -131,36 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('nav a').forEach(a => { if (a.getAttribute('href') === here) a.classList.add('active'); });
 });
 
-// Matrix-style falling code background
-document.addEventListener('DOMContentLoaded', () => {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const c = document.createElement('canvas');
-  c.id = 'rain';
-  document.body.prepend(c);
-  const ctx = c.getContext('2d');
-  const chars = '01<>/="{}();ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿ'.split('');
-  const size = 16;
-  let drops = [];
-  function resize() {
-    c.width = innerWidth; c.height = innerHeight;
-    drops = Array.from({ length: Math.ceil(c.width / size) }, () => Math.random() * -50);
-  }
-  resize(); addEventListener('resize', resize);
-  setInterval(() => {
-    const css = getComputedStyle(document.documentElement);
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.fillStyle = 'rgba(0,0,0,0.08)';
-    ctx.fillRect(0, 0, c.width, c.height);
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.font = size + 'px ' + css.getPropertyValue('--codeFont');
-    drops.forEach((y, i) => {
-      ctx.fillStyle = y % 7 < 1 ? css.getPropertyValue('--secondary') : css.getPropertyValue('--tertiary');
-      ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * size, y * size);
-      drops[i] = y * size > c.height && Math.random() > 0.975 ? 0 : y + 1;
-    });
-  }, 70);
-});
-
 // Connected-node graph in the header (same idea as the fastigiatalab.com entry page)
 document.addEventListener('DOMContentLoaded', () => {
   const header = document.querySelector('header');
