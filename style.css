@@ -71,11 +71,16 @@ button.danger:focus-visible{outline-color:#ff4d4d88}
 #list .snippet-tags>.tag{font-size:.58rem}
 #list .card button,#list .card .btn{font-size:.7rem;padding:2px 9px}
 #list .card .utag{font-size:.58rem;padding:0 5px}
-.snippet-card{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px;align-items:center}
+.snippet-card{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:18px;align-items:center}
+.snippet-content{grid-column:1/-1}
 .snippet-tags{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
 .snippet-tags .utag{margin:0}
+.snippet-details{min-width:0}
+.snippet-tag-field{display:flex;align-items:flex-start;gap:8px;min-height:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#161618}
+.snippet-tag-label{flex:0 0 auto;color:var(--soft);font-size:.68rem;font-weight:700}
+.snippet-no-tags{color:var(--soft);font-size:.68rem}
 .snippet-card h3{margin:6px 0}
 .snippet-actions{display:flex;flex-wrap:wrap;align-items:center;gap:3px}
 .snippet-actions button,.snippet-actions .btn{margin:0}
-#list .snippet-card .snippet-description{margin:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#161618;color:var(--soft);font-size:.74rem}
+#list .snippet-card .snippet-description{grid-column:1/-1;width:100%;box-sizing:border-box;margin:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#161618;color:var(--soft);font-size:.74rem}
 @media(max-width:600px){.snippet-card{grid-template-columns:1fr;gap:10px}}

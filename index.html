@@ -33,18 +33,23 @@ function render() {
   const items = store.all().filter(s => (!tagsel.value || (s.tags || []).includes(tagsel.value)) && (s.title + s.category + s.notes + s.html + (s.tags || []).map(t => ' #' + t).join('')).toLowerCase().includes(t));
   list.innerHTML = items.map(s => `<div class="card snippet-card">
     <div class="snippet-content">
-      <div class="snippet-tags"><span class="tag">${esc(s.category || 'Uncategorised')}</span>
-      ${(s.tags || []).map(t => `<button class="tag utag" data-tag="${esc(t)}" title="Filter by #${esc(t)}">${esc(t)}</button>`).join('')}</div>
+      <div><span class="tag">${esc(s.category || 'Uncategorised')}</span></div>
       <h3>${esc(s.title)}</h3>
-      <div class="snippet-actions">
-        <button data-copy="${esc(s.id)}">Copy HTML</button>
-        <a class="btn secondary" href="test.html?id=${encodeURIComponent(s.id)}">Test</a>
-        <a class="btn secondary" href="add.html?id=${encodeURIComponent(s.id)}">Edit</a>
-        <button class="secondary" data-share="${esc(s.id)}">Share</button>
-        <button class="danger" data-del="${esc(s.id)}">Delete</button>
-      </div>
     </div>
     <p class="snippet-description">${esc(s.notes)}</p>
+    <div class="snippet-actions">
+      <button data-copy="${esc(s.id)}">Copy HTML</button>
+      <a class="btn secondary" href="test.html?id=${encodeURIComponent(s.id)}">Test</a>
+      <a class="btn secondary" href="add.html?id=${encodeURIComponent(s.id)}">Edit</a>
+      <button class="secondary" data-share="${esc(s.id)}">Share</button>
+      <button class="danger" data-del="${esc(s.id)}">Delete</button>
+    </div>
+    <div class="snippet-details">
+      <div class="snippet-tag-field" aria-label="Tags">
+        <span class="snippet-tag-label">Tags</span>
+        <div class="snippet-tags">${(s.tags || []).map(t => `<button class="tag utag" data-tag="${esc(t)}" title="Filter by #${esc(t)}">${esc(t)}</button>`).join('') || '<span class="snippet-no-tags">None</span>'}</div>
+      </div>
+    </div>
   </div>`).join('') || '<p>No snippets yet. <a href="add.html">Add one</a>.</p>';
 }
 list.addEventListener('click', e => {
