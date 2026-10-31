@@ -145,9 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let seed = 731;
   const rand = () => (seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296;
-  const hubs = [[120, 70], [310, 55], [500, 88], [220, 170], [420, 160]].map(([x, y], i) => ({ x, y, r: 4.3, c: i === 2 ? '#a3d2b6' : '#8db7a1' }));
+  const hubs = [[120, 70], [310, 55], [500, 88], [220, 170], [420, 160]].map(([x, y], i) => ({ x, y, r: 4.3, c: i === 2 ? '#84a59d' : '#7b97aa' }));
   const nodes = [...hubs];
-  for (let i = 0; i < 34; i++) nodes.push({ x: 25 + rand() * (W - 50), y: 20 + rand() * (H - 40), r: 1.6 + rand() * 2.4, c: '#8db7a1' });
+  for (let i = 0; i < 34; i++) nodes.push({ x: 25 + rand() * (W - 50), y: 20 + rand() * (H - 40), r: 1.6 + rand() * 2.4, c: '#7b97aa' });
 
   const mk = (tag, attrs, parent) => {
     const el = document.createElementNS(NS, tag);
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const d = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
     if (d < 125 && rand() > 0.74) mk('line', {
       x1: nodes[i].x, y1: nodes[i].y, x2: nodes[j].x, y2: nodes[j].y,
-      stroke: d < 70 ? '#8db7a1' : '#646464', 'stroke-opacity': d < 70 ? .55 : .32, 'stroke-width': d < 70 ? 1.25 : .85
+      stroke: d < 70 ? '#7b97aa' : '#646464', 'stroke-opacity': d < 70 ? .55 : .32, 'stroke-width': d < 70 ? 1.25 : .85
     }, links);
   }
   nodes.forEach((n, i) => mk('circle', { cx: n.x, cy: n.y, r: n.r, fill: n.c, 'fill-opacity': i < hubs.length ? .95 : .8 }, dots));
