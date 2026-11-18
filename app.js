@@ -131,55 +131,66 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('nav a').forEach(a => { if (a.getAttribute('href') === here) a.classList.add('active'); });
 });
 
-// Connected-node graph in the header (same idea as the fastigiatalab.com entry page)
 document.addEventListener('DOMContentLoaded', () => {
   const header = document.querySelector('header');
   if (!header) return;
-  const NS = 'http://www.w3.org/2000/svg', W = 680, H = 240;
-  const svg = document.createElementNS(NS, 'svg');
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-  svg.setAttribute('aria-hidden', 'true');
-  svg.classList.add('header-graph');
-  header.prepend(svg);
+  const canvas = document.createElement('canvas');
+  canvas.className = 'header-rain';
+  canvas.setAttribute('aria-hidden', 'true');
+  header.prepend(canvas);
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
 
-  let seed = 731;
-  const rand = () => (seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296;
-  const hubs = [[120, 70], [310, 55], [500, 88], [220, 170], [420, 160]].map(([x, y], i) => ({ x, y, r: 4.3, c: i === 2 ? '#84a59d' : '#7b97aa' }));
-  const nodes = [...hubs];
-  for (let i = 0; i < 34; i++) nodes.push({ x: 25 + rand() * (W - 50), y: 20 + rand() * (H - 40), r: 1.6 + rand() * 2.4, c: '#7b97aa' });
-
-  const mk = (tag, attrs, parent) => {
-    const el = document.createElementNS(NS, tag);
-    for (const k in attrs) el.setAttribute(k, attrs[k]);
-    parent.appendChild(el); return el;
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const chars = '0123456789{}[]/<>+-=アイウエオカキクケコサシスセソ';
+  let width = 0, height = 0, columns = [], frame = 0, previous = 0;
+  const makeColumn = (x, initial) => {
+    const length = 6 + Math.floor(Math.random() * 9);
+    return {
+      x, length, y: initial ? Math.random() * (height + length * 14) : -Math.random() * height,
+      speed: 10 + Math.random() * 12,
+      chars: Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)])
+    };
   };
-  const glow = mk('g', {}, svg), links = mk('g', {}, svg), dots = mk('g', {}, svg);
-  hubs.forEach(h => mk('circle', { cx: h.x, cy: h.y, r: h.r * 4.2, fill: h.c, 'fill-opacity': .1 }, glow));
-  for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
-    const d = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
-    if (d < 125 && rand() > 0.74) mk('line', {
-      x1: nodes[i].x, y1: nodes[i].y, x2: nodes[j].x, y2: nodes[j].y,
-      stroke: d < 70 ? '#7b97aa' : '#646464', 'stroke-opacity': d < 70 ? .55 : .32, 'stroke-width': d < 70 ? 1.25 : .85
-    }, links);
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+    ctx.font = '11px monospace';
+    columns.forEach(column => column.chars.forEach((char, i) => {
+      ctx.fillStyle = `rgba(180, 184, 188, ${.16 * (1 - i / column.length)})`;
+      ctx.fillText(char, column.x, column.y - i * 14);
+    }));
   }
-  nodes.forEach((n, i) => mk('circle', { cx: n.x, cy: n.y, r: n.r, fill: n.c, 'fill-opacity': i < hubs.length ? .95 : .8 }, dots));
-
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  let tx = 0, ty = 0, px = 0, py = 0, t = 0;
-  header.addEventListener('pointermove', e => {
-    const r = header.getBoundingClientRect();
-    tx = ((e.clientX - r.left) / r.width - .5) * 8; ty = ((e.clientY - r.top) / r.height - .5) * 6;
-  });
-  header.addEventListener('pointerleave', () => { tx = ty = 0; });
-  (function tick() {
-    t += .012; px += (tx - px) * .07; py += (ty - py) * .07;
-    const x = Math.sin(t) * 1.8 + px, y = Math.cos(t * .9) * 1.3 + py;
-    dots.setAttribute('transform', `translate(${x},${y})`);
-    links.setAttribute('transform', `translate(${x * .85},${y * .85})`);
-    glow.setAttribute('transform', `translate(${x * .6},${y * .6})`);
-    requestAnimationFrame(tick);
-  })();
+  function tick(time) {
+    if (previous && time - previous < 50) {
+      frame = requestAnimationFrame(tick);
+      return;
+    }
+    const elapsed = previous ? Math.min((time - previous) / 1000, .1) : 0;
+    previous = time;
+    columns = columns.map(column => {
+      column.y += column.speed * elapsed;
+      return column.y - column.length * 14 > height ? makeColumn(column.x, false) : column;
+    });
+    draw();
+    frame = requestAnimationFrame(tick);
+  }
+  function updateAnimation() {
+    cancelAnimationFrame(frame);
+    previous = 0;
+    draw();
+    if (!motion.matches && !document.hidden) frame = requestAnimationFrame(tick);
+  }
+  function resize() {
+    const rect = header.getBoundingClientRect(), scale = Math.min(devicePixelRatio || 1, 2);
+    width = rect.width; height = rect.height;
+    canvas.width = Math.round(width * scale); canvas.height = Math.round(height * scale);
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    columns = Array.from({ length: Math.ceil(width / 22) }, (_, i) => makeColumn(i * 22 + 4, true));
+    updateAnimation();
+  }
+  new ResizeObserver(resize).observe(header);
+  motion.addEventListener('change', updateAnimation);
+  document.addEventListener('visibilitychange', updateAnimation);
 });
 
 // Share links: snippet is packed into the URL hash (no server), so anyone with the link can open it.

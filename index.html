@@ -11,7 +11,8 @@
     <select id="tagsel" aria-label="Filter by tag"></select>
   </div>
   <button id="export" class="secondary">Export JSON</button>
-  <label class="btn secondary" style="font-weight:normal">Import JSON<input id="import" type="file" accept=".json" hidden></label>
+  <button id="import-button" class="secondary" type="button">Import JSON</button>
+  <input id="import" type="file" accept=".json" hidden>
 </div>
 <p id="syncstat" class="intro" style="font-size:.8rem"></p>
 <div id="list"></div>
@@ -69,6 +70,7 @@ document.getElementById('export').onclick = () => {
   a.href = URL.createObjectURL(new Blob([JSON.stringify(store.all(), null, 2)], { type: 'application/json' }));
   a.download = 'moodle-snippets.json'; a.click();
 };
+document.getElementById('import-button').onclick = () => document.getElementById('import').click();
 document.getElementById('import').onchange = async e => {
   try {
     const data = JSON.parse(await e.target.files[0].text());
