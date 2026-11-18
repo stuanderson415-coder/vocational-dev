@@ -11,7 +11,7 @@ a{color:var(--violet);text-decoration:none;transition:color .15s}
 a:hover{color:var(--green)}
 header{width:min(960px,100%);margin:0 auto 18px;border:1px solid var(--line);border-radius:26px;background:linear-gradient(145deg,#232427cc,#161618cc);box-shadow:0 24px 70px #0008;padding:clamp(20px,4vw,36px);text-align:center}
 .brand-label{display:flex;align-items:center;justify-content:center;gap:7px;color:#73dfd4;font-size:.74rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px}
-.github-sync svg{display:block;width:14px;height:14px;fill:currentColor}
+.github-sync svg{display:block;width:12.25px;height:12.25px;fill:currentColor}
 header h1{margin-bottom:16px}
 nav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 
@@ -24,13 +24,13 @@ nav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:4.375px;
-  padding:4.375px 8.75px;
+  gap:3.828125px;
+  padding:3.828125px 7.65625px;
   border:1px solid var(--button-border);
   border-radius:999px;
   background:#232427;
   color:#d2ebe0;
-  font:600 .74375rem/1.5 Inter,system-ui,sans-serif;
+  font:600 .65078125rem/1.5 Inter,system-ui,sans-serif;
   letter-spacing:normal;
   text-decoration:none;
   cursor:pointer;
@@ -53,7 +53,7 @@ nav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
   outline-offset:3px;
 }
 button,.btn{margin:3px 4px 3px 0}
-.github-sync{padding:2.625px}
+.github-sync{padding:2.296875px}
 button.danger{
   --button-border:#92595d;
   --button-hover-border:#ca8588;
@@ -95,13 +95,13 @@ code{font-family:var(--codeFont);font-size:.8em;background:#161618;border:1px so
 header{position:relative;overflow:hidden;isolation:isolate}
 .header-rain{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
 header:after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at center,#161618aa 0,transparent 70%);pointer-events:none}
-.utag{margin:0 0 0 6px;padding:.875px 5.25px;font-size:.5425rem;font-weight:700}
+.utag{margin:0 0 0 6px;padding:.765625px 4.59375px;font-size:.4746875rem;font-weight:700}
 .utag:before{content:"#"}
 #list .card h3{font-size:.88rem}
 #list .card p{font-size:.8rem}
 #list .snippet-tags>.tag{font-size:.58rem}
-#list .card button,#list .card .btn{font-size:.665rem;padding:3.5px 7.875px}
-#list .card .utag{font-size:.5075rem;padding:0 4.375px}
+#list .card button,#list .card .btn{font-size:.581875rem;padding:3.0625px 6.890625px}
+#list .card .utag{font-size:.4440625rem;padding:0 3.828125px}
 .snippet-card{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:18px;align-items:center}
 .snippet-content{grid-column:1/-1}
 .snippet-tags{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
