@@ -88,7 +88,8 @@ code{font-family:var(--codeFont);font-size:.8em;background:#161618;border:1px so
 .projects{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
 .project{display:flex;gap:14px;align-items:flex-start;margin:0;transition:border-color .15s,transform .15s}
 .project:hover{border-color:var(--violet);transform:translateY(-2px)}
-.project img{width:56px;height:56px;border-radius:12px;flex:none;border:1px solid var(--line);background:#161618}
+.project :is(img,.project-terminal-icon){width:56px;height:56px;border-radius:12px;flex:none;border:1px solid var(--line);background:#161618}
+.project-terminal-icon{display:grid;place-items:center;color:#73dfd4;font:700 1.35rem/1 var(--codeFont)}
 .project h3{margin:0 0 2px;color:var(--text)}
 .project p{margin:6px 0 0;color:var(--soft);font-size:.8rem}
 .addr{color:var(--violet);font-family:var(--codeFont);font-size:.7rem}
