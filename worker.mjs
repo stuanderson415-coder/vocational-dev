@@ -33,7 +33,8 @@ async function serveLibrary(request, env) {
     return new Response('Sign in to the private Snippet Library.', { status: 401, headers });
   }
 
-  const response = new Response(await env.ASSETS.fetch(request));
+  const asset = await env.ASSETS.fetch(request);
+  const response = new Response(asset.body, asset);
   response.headers.set('Cache-Control', headers.get('Cache-Control'));
   return response;
 }
