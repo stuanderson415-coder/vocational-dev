@@ -10,7 +10,7 @@ h3{font-size:.94rem;letter-spacing:-.01em}
 a{color:var(--violet);text-decoration:none;transition:color .15s}
 a:hover{color:var(--green)}
 header{width:min(960px,100%);margin:0 auto 18px;border:1px solid var(--line);border-radius:26px;background:linear-gradient(145deg,#232427cc,#161618cc);box-shadow:0 24px 70px #0008;padding:clamp(20px,4vw,36px);text-align:center}
-.brand-label{display:flex;align-items:center;justify-content:center;gap:7px;color:#73dfd4;font-size:.74rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px}
+.brand-label{display:flex;align-items:center;justify-content:center;gap:7px;color:#468BE3;font-size:.74rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px}
 .github-sync svg{display:block;width:12.25px;height:12.25px;fill:currentColor}
 header h1{margin-bottom:16px}
 nav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
